@@ -16,8 +16,8 @@ public class ExpireableConfig {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public CustomableCacheAdvisor customableCacheAdvisor(
-            CacheAnnotationHandler cacheAnnotationHandler) {
-        return new CustomableCacheAdvisor(customableCacheInterceptor(cacheAnnotationHandler));
+            CustomableCacheInterceptor customableCacheInterceptor) {
+        return new CustomableCacheAdvisor(customableCacheInterceptor);
     }
 
     @Bean

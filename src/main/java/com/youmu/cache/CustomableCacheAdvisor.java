@@ -21,7 +21,6 @@ import com.youmu.cache.annotation.Expireable;
 public class CustomableCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor
         implements InitializingBean, PriorityOrdered {
 
-
     private Pointcut pointcut = AnnotationMatchingPointcut.forMethodAnnotation(Expireable.class);
 
     private CacheAnnotationHandler cacheAnnotationHandler;
@@ -40,12 +39,13 @@ public class CustomableCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (null == cacheAnnotationHandler && null == getAdvice()
-                && StringUtils.isEmpty(getAdviceBeanName())) {
-            throw new NullPointerException(
-                    "advise or prop[cacheAnnotationHandler] cannot be null!");
+        if (null == getAdvice() && StringUtils.isEmpty(getAdviceBeanName())) {
+            if (null == cacheAnnotationHandler) {
+                throw new NullPointerException(
+                        "advise or prop[cacheAnnotationHandler] cannot be null!");
+            }
+            setAdvice(new CustomableCacheInterceptor(cacheAnnotationHandler));
         }
-        setAdvice(new CustomableCacheInterceptor(cacheAnnotationHandler));
     }
 
     public void setCacheAnnotationHandler(CacheAnnotationHandler cacheAnnotationHandler) {
