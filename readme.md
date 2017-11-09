@@ -1,13 +1,13 @@
-#常用工具
+# 常用工具
 
-###com.youmu.utils.EnumUtils
+### com.youmu.utils.EnumUtils
 这里是常用的枚举工具
 
-###com.youmu.utils.ReflectUtils
+### com.youmu.utils.ReflectUtils
 这里提供一些与spring不一样的工具
 
 
-##spring-cache-support
+## spring-cache-support
 让spring的cache获得过期属性。(注，spring cache人需要自信配置，此缓存依赖spring cache)
 
 默认实现对spring-data-redis的RedisCacheManager进行过期行为控制。
