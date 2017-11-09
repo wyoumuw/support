@@ -7,11 +7,12 @@ import com.youmu.cache.annotation.Expireable;
 
 /**
  * @Author: YOUMU
- * @Description:
+ * @Description: 处理过期逻辑
  * @Date: 2017/11/08
  */
 public interface CacheAnnotationHandler {
     HandleResult handle(Expireable expireable, MethodInvocation method);
+
 
     class HandleResult {
 
