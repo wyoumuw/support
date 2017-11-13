@@ -9,7 +9,11 @@ import org.slf4j.LoggerFactory;
  * @Date: 2017/08/09
  */
 public interface Loggable {
-    public default Logger getLog() {
+    /**
+     * don't override this method on sub-class
+     * @return
+     */
+     default Logger getLog() {
         return LoggerFactory.getLogger(this.getClass());
     }
 }

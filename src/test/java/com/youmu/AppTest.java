@@ -32,4 +32,8 @@ public class AppTest implements BeanFactoryAware {
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
     }
+
+    public static void main(String[] args) {
+        
+    }
 }
