@@ -12,6 +12,13 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @Author: YOUMU
  * @Description:
@@ -33,7 +40,30 @@ public class AppTest implements BeanFactoryAware {
         this.beanFactory = beanFactory;
     }
 
-    public static void main(String[] args) {
-        
+    @Test
+    public void testHashMap() {
+        Map<MyOb, String> map = new HashMap<>();
+        for (int i=0;i<11;i++){
+            map.put(new MyOb(String.valueOf(1+i*16)),String.valueOf(i+1));
+        }
+        System.out.println();
     }
+
+    static class MyOb {
+        private String s;
+
+        public MyOb(String s) {
+            this.s = s;
+        }
+
+        @Override
+        public int hashCode() {
+            return Integer.valueOf(s);
+        }
+    }
+
+    public static void add(Set<?> set) {
+        set.remove(1);
+    }
+
 }

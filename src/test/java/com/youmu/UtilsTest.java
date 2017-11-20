@@ -1,8 +1,11 @@
 package com.youmu;
 
+import com.youmu.common.Loggable;
 import org.junit.Test;
 
 import com.youmu.utils.EnumUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Author: YOUMU
@@ -37,4 +40,10 @@ public class UtilsTest {
     }
     /******************************ReflectUtils test****************************/
 
+    class BaseService implements Loggable{
+	}
+	class Service extends BaseService{
+    	public void s(){
+		}
+	}
 }

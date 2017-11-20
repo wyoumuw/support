@@ -1,11 +1,18 @@
 package com.youmu;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.junit.Test;
+import org.springframework.test.annotation.SystemProfileValueSource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * @Author: YOUMU
@@ -18,6 +25,11 @@ public class GcTest {
 		{
 			System.out.println("<init()>");
 		}
+
+		A(){
+			System.out.println("A()");
+		}
+
         public Comparable getComp() {
             return new C();
         }
@@ -29,13 +41,7 @@ public class GcTest {
             }
         }
     }
-    public static final class Container{
-		A a;
-		public void newA(){
-			a=new A();
-		}
-	}
-
+	static Map m=new HashMap();
     @Test
     public void circleRef() {
         Scanner scanner = new Scanner(System.in);
@@ -46,29 +52,37 @@ public class GcTest {
         System.out.println("getComp");
         scanner.next();
         a = null;
-        // c=null;//memory leak
+		c=null;//memory leak
         System.out.println("null");
         scanner.next();
     }
 
-    @Test
-    public void innerClassIsConsumables(){
-		List<Integer> l = new ArrayList<>();
-		l.add(1);
-		l.add(2);
-		l.add(3);
-		l.add(4);
-		l.add(5);
-		l.add(6);
-		for (Integer integer : l) {
-			if (integer.intValue() == 4) {
-				l.remove(integer);
-			}
+	public static final class Container{
+		A a;
+		public void newA(){
+			a=new A();
 		}
 	}
 
+    @Test
+    public void innerClassIsConsumables(){
+    	Map map= Maps.newHashMap();
+		List list=Lists.newArrayList();
+		Iterator iterator=list.iterator();
+	}
     public static void main(String[] args) {
-    	Container c=new Container();
-    	c.newA();
+		Scanner scanner = new Scanner(System.in);
+		A a = new A();
+		System.out.println("new A");
+		scanner.next();
+		Comparable c = a.getComp();
+		System.out.println("getComp");
+		scanner.next();
+		a = null;
+//		c=null;//memory leak
+		System.out.println("null");
+		scanner.next();
+//    	Container c=new Container();
+//    	c.newA();
     }
 }
