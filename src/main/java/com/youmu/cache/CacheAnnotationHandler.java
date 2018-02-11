@@ -4,7 +4,6 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import com.youmu.cache.annotation.Expireable;
 
-
 /**
  * @Author: YOUMU
  * @Description: 处理过期逻辑
@@ -13,10 +12,9 @@ import com.youmu.cache.annotation.Expireable;
 public interface CacheAnnotationHandler {
     HandleResult handle(Expireable expireable, MethodInvocation method);
 
-
     class HandleResult {
 
-        public final static HandleResult CONTINUE = new HandleResult(true, null);
+        public static final HandleResult CONTINUE = new HandleResult(true, null);
 
         private boolean doChain;
         private Object rtnVal;

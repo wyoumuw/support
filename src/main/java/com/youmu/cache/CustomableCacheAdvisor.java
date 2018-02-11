@@ -21,9 +21,10 @@ import com.youmu.cache.annotation.Expireable;
 public class CustomableCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor
         implements InitializingBean, PriorityOrdered {
 
-    private Pointcut pointcut = AnnotationMatchingPointcut.forMethodAnnotation(Expireable.class);
+    private transient Pointcut pointcut = AnnotationMatchingPointcut
+            .forMethodAnnotation(Expireable.class);
 
-    private CacheAnnotationHandler cacheAnnotationHandler;
+    private transient CacheAnnotationHandler cacheAnnotationHandler;
 
     public CustomableCacheAdvisor() {
     }
@@ -50,5 +51,15 @@ public class CustomableCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor
 
     public void setCacheAnnotationHandler(CacheAnnotationHandler cacheAnnotationHandler) {
         this.cacheAnnotationHandler = cacheAnnotationHandler;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

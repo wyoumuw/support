@@ -3,3 +3,5 @@ target
 csi-tmp
 .idea
 *.iml
+/.scannerwork/
+/sonar-project.properties

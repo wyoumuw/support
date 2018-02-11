@@ -1,5 +1,8 @@
 package com.youmu.utils;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -21,17 +24,17 @@ public final class EnumUtils {
      * 根据属性获取枚举
      * @param enumClass 枚举类
      * @param ele 需要获取的属性的值
-     * @param getMethod 属性的get方法
+     * @param getterMethod 属性的get方法
      * @param <E> 枚举类型
      * @param <V> 属性类型
      * @return
      */
-    public static <E extends Enum, V> E getByProperty(Class<E> enumClass, V ele,
-            Function<E, V> getMethod) {
-        if (null == getMethod) {
-            return null;
+    public static <E extends Enum, V> Optional<E> getByProperty(Class<E> enumClass, V ele,
+            Function<E, V> getterMethod) {
+        if (null == getterMethod) {
+            return Optional.empty();
         }
-        return get(enumClass, ele, (e, v) -> getMethod.apply(e).equals(v));
+        return get(enumClass, ele, (e, v) -> Objects.equals(getterMethod.apply(e), v));
     }
 
     /**
@@ -43,19 +46,21 @@ public final class EnumUtils {
      * @param <V> 属性类型
      * @return
      */
-    public static <E extends Enum, V> E get(Class<E> enumClass, V ele,
-            EqualsComparator<E, V> comparator) {
+    public static <E extends Enum, V> Optional<E> get(Class<E> enumClass, V ele,
+            BiPredicate<E, V> comparator) {
         if (null == comparator) {
-            return null;
+            return Optional.empty();
         }
         Enum[] es = enumClass.getEnumConstants();
+        E ret = null;
         for (int i = 0; i < es.length; i++) {
             Enum e = es[i];
-            if (comparator.equalsTo((E) e, ele)) {
-                return (E) e;
+            if (comparator.test((E) e, ele)) {
+                ret = (E) e;
+                break;
             }
         }
-        return null;
+        return Optional.ofNullable(ret);
     }
 
     /**
@@ -68,14 +73,8 @@ public final class EnumUtils {
      * @return
      */
     public static <E extends Enum, V> boolean contains(Class<E> enumClass, V ele,
-            EqualsComparator<E, V> comparator) {
-        return null != get(enumClass, ele, comparator);
-    }
-
-    public interface EqualsComparator<V1, V2> {
-
-        boolean equalsTo(V1 value1, V2 value2);
-
+            BiPredicate<E, V> comparator) {
+        return get(enumClass, ele, comparator).isPresent();
     }
 
 }

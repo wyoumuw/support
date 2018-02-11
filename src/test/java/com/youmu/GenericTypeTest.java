@@ -14,12 +14,16 @@ import java.util.Map;
  */
 public class GenericTypeTest {
 
-	@Test
+    @Test
     public void superTest() {
         List<Number> list = Lists.newArrayList();
         Map<UtilsTest.HttpCode, String> map = new EnumMap<UtilsTest.HttpCode, String>(
                 UtilsTest.HttpCode.class);
+        map.put(UtilsTest.HttpCode.CODE_200, UtilsTest.HttpCode.CODE_200.getDesc());
+        System.out.println(map);
+
     }
 
-    static interface Interface{}
+    static interface Interface {
+    }
 }
