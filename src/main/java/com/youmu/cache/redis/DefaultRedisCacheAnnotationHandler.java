@@ -24,7 +24,7 @@ import com.youmu.cache.CacheAnnotationHandler;
 import com.youmu.cache.annotation.Expireable;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description:
  * @Date: 2018/05/08
  */

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.AdviceModeImportSelector;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description:
  * @Date: 2018/05/08
  */
