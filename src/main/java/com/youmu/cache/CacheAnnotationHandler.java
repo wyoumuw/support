@@ -4,36 +4,13 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import com.youmu.cache.annotation.Expireable;
 
+import java.lang.reflect.Method;
+
 /**
  * @Author: YOUMU
  * @Description: 处理过期逻辑
  * @Date: 2017/11/08
  */
 public interface CacheAnnotationHandler {
-    HandleResult handle(Expireable expireable, MethodInvocation method);
-
-    class HandleResult {
-
-        public static final HandleResult CONTINUE = new HandleResult(true, null);
-
-        private boolean doChain;
-        private Object rtnVal;
-
-        private HandleResult(boolean doChain, Object rtnVal) {
-            this.doChain = doChain;
-            this.rtnVal = rtnVal;
-        }
-
-        public boolean getDoChain() {
-            return doChain;
-        }
-
-        public Object getRtnVal() {
-            return rtnVal;
-        }
-
-        public static HandleResult of(boolean doChain, Object rtnVal) {
-            return new HandleResult(doChain, rtnVal);
-        }
-    }
+    void handle(Expireable expireable, Method method);
 }

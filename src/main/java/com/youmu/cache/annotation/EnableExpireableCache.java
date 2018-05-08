@@ -7,9 +7,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.youmu.cache.ExpireableImportSelector;
+import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Import;
 
 import com.youmu.cache.ExpireableConfig;
+import org.springframework.core.Ordered;
 
 /**
  * @Author: YOUMU
@@ -20,6 +23,12 @@ import com.youmu.cache.ExpireableConfig;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@Import(ExpireableConfig.class)
+@Import(ExpireableImportSelector.class)
 public @interface EnableExpireableCache {
+
+	boolean proxyTargetClass() default false;
+
+	AdviceMode mode() default AdviceMode.PROXY;
+
+	int order() default Ordered.LOWEST_PRECEDENCE;
 }

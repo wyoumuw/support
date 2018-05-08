@@ -28,6 +28,6 @@ public class TestConfig {
 
     @Bean
     public RedisCacheManager redisCacheManager() {
-        return new RedisCacheManager(redisTemplate());
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(jedisConnectionFactory()).build();
     }
 }

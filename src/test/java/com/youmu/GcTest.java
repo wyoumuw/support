@@ -1,27 +1,17 @@
 package com.youmu;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.primitives.Bytes;
-import com.youmu.cache.RedisConfig;
 import com.youmu.common.wrapper.Wrapper;
 import org.junit.Test;
-import org.springframework.test.annotation.SystemProfileValueSource;
-import sun.misc.GC;
 
-import java.lang.management.MemoryType;
-import java.lang.management.MemoryUsage;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
@@ -125,19 +115,6 @@ public class GcTest {
         System.out.println(">>>>>>>>>>>>>>>map:" + weakHashMap);
     }
 
-    public static void main(String[] as) {
-        Scanner scanner = new Scanner(System.in);
-        RedisConfig a = new RedisConfig();
-        System.gc();
-        scanner.next();
-        Wrapper wrapper = new Wrapper(a);
-        System.gc();
-        scanner.next();
-        wrapper = null;
-        System.gc();
-        scanner.next();
-        System.out.println("over");
-    }
 
     @Test
     public void test() {

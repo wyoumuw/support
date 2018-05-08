@@ -1,9 +1,11 @@
-package com.youmu.cache;
+package com.youmu.cache.redis;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+
+import com.youmu.cache.CacheAnnotationHandler;
+import com.youmu.cache.CustomableCacheAnnotationParser;
 
 /**
  * @Author: YOUMU
@@ -14,8 +16,13 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 public class RedisConfig {
 
     @Bean
-    @Conditional(BeanCondition.class)
     public CacheAnnotationHandler cacheAnnotationHandler(RedisCacheManager redisCacheManager) {
         return new DefaultRedisCacheAnnotationHandler(redisCacheManager);
+    }
+
+    @Bean
+    public CustomableCacheAnnotationParser customableCacheAnnotationParser(
+            RedisCacheManager redisCacheManager) {
+        return new CustomableCacheAnnotationParser(cacheAnnotationHandler(redisCacheManager));
     }
 }
