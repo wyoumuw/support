@@ -1,8 +1,8 @@
 package com.youmu.support.spring;
 
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import java.util.List;
+
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Created by wyoumuw on 2018/8/17.
@@ -10,22 +10,14 @@ import java.util.List;
 public class RequestInfoHolder {
     private String uri;
     private RequestMethod requestMethod;
-    private List<String> paramNames;
+    private List<SpringParamInfoHolder> paramInfos;
 
     public void setUri(String uri) {
         this.uri = uri;
     }
 
-    public void setParamNames(List<String> paramNames) {
-        this.paramNames = paramNames;
-    }
-
     public String getUri() {
         return uri;
-    }
-
-    public List<String> getParamNames() {
-        return paramNames;
     }
 
     public RequestMethod getRequestMethod() {
@@ -34,5 +26,13 @@ public class RequestInfoHolder {
 
     public void setRequestMethod(RequestMethod requestMethod) {
         this.requestMethod = requestMethod;
+    }
+
+    public List<SpringParamInfoHolder> getParamInfos() {
+        return paramInfos;
+    }
+
+    public void setParamInfos(List<SpringParamInfoHolder> paramInfos) {
+        this.paramInfos = paramInfos;
     }
 }
