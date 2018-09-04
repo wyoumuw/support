@@ -1,12 +1,12 @@
-package com.youmu.support.spring;
+package com.youmu.support.spring.serviceinvoker;
+
+import java.lang.reflect.Proxy;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Proxy;
-
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: youmu
  * @Description:
  * @Date: 2018/08/17
  */
@@ -17,6 +17,8 @@ public class WebServiceFactoryBean<T> implements FactoryBean<T> {
 
     private T webService;
 
+    private ServiceInvokerFactory serviceInvokerFactory;
+
     public WebServiceFactoryBean(Class<T> webServiceInterface) {
         Assert.notNull(webServiceInterface, "webServiceInterface can not be null");
         this.webServiceInterface = webServiceInterface;
@@ -25,8 +27,8 @@ public class WebServiceFactoryBean<T> implements FactoryBean<T> {
     @Override
     public T getObject() throws Exception {
         webService = (T) Proxy.newProxyInstance(webServiceInterface.getClassLoader(),
-                new Class[] { webServiceInterface },
-                new ServiceProxy<>(webServiceInterface, serviceConfiguration));
+                new Class[] { webServiceInterface }, new ServiceProxy<>(webServiceInterface,
+                        serviceInvokerFactory, serviceConfiguration));
         return webService;
     }
 
@@ -53,6 +55,17 @@ public class WebServiceFactoryBean<T> implements FactoryBean<T> {
     }
 
     public void setServiceConfiguration(ServiceConfiguration serviceConfiguration) {
+        // check it
+        Assert.notNull(serviceConfiguration, "serviceConfiguration cannot be null");
+        serviceConfiguration.checkServiceConfiguration();
         this.serviceConfiguration = serviceConfiguration;
+    }
+
+    public void setServiceInvokerFactory(ServiceInvokerFactory serviceInvokerFactory) {
+        this.serviceInvokerFactory = serviceInvokerFactory;
+    }
+
+    public ServiceInvokerFactory getServiceInvokerFactory() {
+        return serviceInvokerFactory;
     }
 }

@@ -1,7 +1,7 @@
 package com.youmu.exception;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: youmu
  * @Description:
  * @Date: 2018/08/17
  */

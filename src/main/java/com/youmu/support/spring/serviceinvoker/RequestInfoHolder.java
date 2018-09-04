@@ -1,7 +1,9 @@
-package com.youmu.support.spring;
+package com.youmu.support.spring.serviceinvoker;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
@@ -11,6 +13,16 @@ public class RequestInfoHolder {
     private String uri;
     private RequestMethod requestMethod;
     private List<SpringParamInfoHolder> paramInfos;
+    private MediaType contentType;
+    private Charset charset;
+
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public void setCharset(Charset charset) {
+        this.charset = charset;
+    }
 
     public void setUri(String uri) {
         this.uri = uri;
@@ -34,5 +46,13 @@ public class RequestInfoHolder {
 
     public void setParamInfos(List<SpringParamInfoHolder> paramInfos) {
         this.paramInfos = paramInfos;
+    }
+
+    public MediaType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(MediaType contentType) {
+        this.contentType = contentType;
     }
 }

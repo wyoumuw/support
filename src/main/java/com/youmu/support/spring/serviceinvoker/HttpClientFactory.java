@@ -1,10 +1,13 @@
-package com.youmu.support.spring;
+package com.youmu.support.spring.serviceinvoker;
 
 import com.youmu.common.Factory;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+
 /**
- * Created by wyoumuw on 2018/8/17.
+ * best to create a cached httpclient,cause it will don't shutdown after that
+ * use to one request
+ * @param <T> httpclient type
  */
 public interface HttpClientFactory<T extends CloseableHttpClient> extends Factory<T> {
 }
