@@ -13,11 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -55,6 +53,9 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 // @DependenceOn("jackson")
 public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
+
+    private final static MediaType DEFAULT_MEDIATYPE = MediaType.APPLICATION_JSON;
+    private final static Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
     private final Method method;
     private final HttpClientServiceConfiguration serviceConfiguration;
@@ -103,11 +104,11 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         // TODO 目前只支持一个content-type
         if (0 != handlerRequestMapping.consumes().length) {
             String consume = handlerRequestMapping.consumes()[0];
-            requestInfoHolder.setContentType(MediaType.parseMediaType(consume));
-            Matcher matcher = PATTERN_CHARSET.matcher(consume);
-            if (matcher.find()) {
-                requestInfoHolder.setCharset(Charset.forName(matcher.group(1)));
-            }
+            MediaType mediaType = MediaType.parseMediaType(consume);
+            requestInfoHolder.setCharset(mediaType.getCharset());
+            mediaType = MediaType
+                    .parseMediaType(mediaType.getType() + '/' + mediaType.getSubtype());
+            requestInfoHolder.setContentType(mediaType);
         }
         requestInfoHolder.setUri(uriStringBuilder.toString());
         requestInfoHolder.setParamInfos(paramInfos);
@@ -151,7 +152,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     }
 
     @Override
-    public Object invoke(Object[] args) {
+    public Object invoke(Object[] args) throws Throwable {
         HttpClientServiceConfiguration httpClientServiceConfiguration = serviceConfiguration;
         HttpClientFactory<?> httpClientFactory = httpClientServiceConfiguration
                 .getHttpClientFactory();
@@ -160,14 +161,9 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
                 .fromUriString(requestInfoHolder.getUri());
         HttpUriRequest httpUriRequest = createHttpUriRequest(requestInfoHolder,
                 uriComponentsBuilder, args);
-        try {
-            CloseableHttpResponse closeableHttpResponse = closeableHttpClient
-                    .execute(httpUriRequest);
-            return httpClientServiceConfiguration.getHttpClientResponseHandler()
-                    .handleResponse(closeableHttpResponse, method.getReturnType());
-        } catch (IOException | HttpException e) {
-            throw new RuntimeException(e);
-        }
+        CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpUriRequest);
+        return httpClientServiceConfiguration.getHttpClientResponseHandler()
+                .handleResponse(closeableHttpResponse, method.getGenericReturnType());
     }
 
     /**
@@ -178,7 +174,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
      * @return
      */
     protected HttpUriRequest createHttpUriRequest(RequestInfoHolder requestInfoHolder,
-												  UriComponentsBuilder uriComponentsBuilder, Object[] args) {
+            UriComponentsBuilder uriComponentsBuilder, Object[] args) {
         switch (requestInfoHolder.getRequestMethod()) {
         case GET:
             return createNoBodyRequest(requestInfoHolder, uriComponentsBuilder, args);
@@ -203,7 +199,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     }
 
     protected HttpRequestBase createNoBodyRequest(RequestInfoHolder requestInfoHolder,
-												  UriComponentsBuilder uriComponentsBuilder, Object[] args) {
+            UriComponentsBuilder uriComponentsBuilder, Object[] args) {
         HttpRequestBase httpRequest;
         if (requestInfoHolder.getRequestMethod() == RequestMethod.DELETE) {
             httpRequest = new HttpDelete();
@@ -214,6 +210,8 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         } else {
             throw new UnsupportedOperationException("Request type is not supported");
         }
+        // set default headers
+        setDefaultHeaders(httpRequest);
         Map<String, String> pathVariables = new HashMap<>();
         for (int i = 0; i < requestInfoHolder.getParamInfos().size(); i++) {
             SpringParamInfoHolder springParamInfoHolder = requestInfoHolder.getParamInfos().get(i);
@@ -251,7 +249,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     }
 
     protected HttpEntityEnclosingRequestBase createBodyRequest(RequestInfoHolder requestInfoHolder,
-															   UriComponentsBuilder uriComponentsBuilder, Object[] args) {
+            UriComponentsBuilder uriComponentsBuilder, Object[] args) {
         HttpEntityEnclosingRequestBase httpRequest;
         if (requestInfoHolder.getRequestMethod() == RequestMethod.PUT) {
             httpRequest = new HttpPut();
@@ -260,6 +258,8 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         } else {
             throw new UnsupportedOperationException("Request is not supported");
         }
+        // set default headers
+        setDefaultHeaders(httpRequest);
         Map<String, String> pathVariables = new HashMap<>();
         HttpEntity httpEntity = null;
         for (int i = 0; i < requestInfoHolder.getParamInfos().size(); i++) {
@@ -303,8 +303,20 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         return httpRequest;
     }
 
+    /**
+     * 添加默认的头
+     * @param request
+     */
+    private void setDefaultHeaders(HttpRequest request) {
+        if (!CollectionUtils.isEmpty(serviceConfiguration.getHeaders())) {
+            for (Map.Entry<String, String> entry : serviceConfiguration.getHeaders().entrySet()) {
+                request.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     private void setQueryParam(UriComponentsBuilder uriComponentsBuilder, String name,
-							   String value) {
+            String value) {
         if (null != value) {
             uriComponentsBuilder.queryParam(name, value);
         }
@@ -312,7 +324,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
 
     private void setHeaderParam(HttpRequest request, String name, String value) {
         if (null != value) {
-            request.addHeader(name, value);
+            request.setHeader(name, value);
         }
     }
 
@@ -445,8 +457,8 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         private Charset charset;
 
         ByteArrayEntityMessage(MediaType contentType, Charset charset) {
-            this.contentType = contentType;
-            this.charset = null == charset ? Charset.forName("UTF-8") : charset;
+            this.contentType = null == contentType ? DEFAULT_MEDIATYPE : contentType;
+            this.charset = null == charset ? DEFAULT_CHARSET : charset;
         }
 
         @Override

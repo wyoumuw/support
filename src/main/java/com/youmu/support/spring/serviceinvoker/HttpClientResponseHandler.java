@@ -1,10 +1,13 @@
 package com.youmu.support.spring.serviceinvoker;
 
-import org.apache.http.HttpException;
+
+import com.youmu.exception.HttpErrorException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
+import java.lang.reflect.Type;
+
 /**
- * @Author: youmu
+ * @Author: YLBG-LDH-1506
  * @Description:
  * @Date: 2018/08/23
  */
@@ -14,5 +17,5 @@ public interface HttpClientResponseHandler {
      * @param response
      * @return
      */
-    Object handleResponse(CloseableHttpResponse response, Class rtnType) throws HttpException;
+    Object handleResponse(CloseableHttpResponse response, Type rtnType) throws HttpErrorException;
 }
