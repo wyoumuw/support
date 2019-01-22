@@ -1,7 +1,8 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.core;
 
 import java.util.List;
 
+import com.youmu.support.spring.serviceinvoker.SimpleBeanNameGenerator;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -18,11 +19,11 @@ import org.springframework.util.StringUtils;
 import com.google.common.collect.Lists;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description: service扫描器配置
  * @Date: 2018/08/15
  */
-public class HttpServiceScannerConfigure
+public class ServiceScannerConfigure
         implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
     private String serviceConfigurationName;
@@ -39,7 +40,7 @@ public class HttpServiceScannerConfigure
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
             throws BeansException {
-        HttpServiceScanner scanner = new HttpServiceScanner(registry);
+        ServiceScanner scanner = new ServiceScanner(registry);
         for (Class webServiceAnnotation : webServiceAnnotations) {
             scanner.addIncludeFilter(new AnnotationTypeFilter(webServiceAnnotation));
         }

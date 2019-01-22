@@ -1,4 +1,4 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.request;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -54,5 +54,15 @@ public class RequestInfoHolder {
 
     public void setContentType(MediaType contentType) {
         this.contentType = contentType;
+    }
+
+    public MediaType getMergedContentType() {
+        if (null == contentType) {
+            return null;
+        }
+        if (null != charset) {
+            return new MediaType(contentType, charset);
+        }
+        return contentType;
     }
 }

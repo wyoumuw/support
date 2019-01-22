@@ -1,10 +1,11 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.core;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.youmu.support.spring.serviceinvoker.httpclient.impl.DefaultServiceInvoker;
 import org.springframework.util.Assert;
 
 /**
@@ -16,12 +17,12 @@ public class ServiceProxy<T> implements InvocationHandler {
 
     private Class<T> serviceInterface;
 
-    private ServiceConfiguration serviceConfiguration;
+    private HttpServiceConfiguration serviceConfiguration;
 
     private ServiceInvokerFactory serviceInvokerFactory;
 
     public ServiceProxy(Class<T> serviceInterface, ServiceInvokerFactory serviceInvokerFactory,
-            ServiceConfiguration serviceConfiguration) {
+            HttpServiceConfiguration serviceConfiguration) {
         Assert.notNull(serviceInterface, "serviceInterface cannot be null");
         Assert.notNull(serviceInvokerFactory, "serviceInvokerFactory cannot be null");
         Assert.notNull(serviceConfiguration, "serviceConfiguration cannot be null");
@@ -58,11 +59,11 @@ public class ServiceProxy<T> implements InvocationHandler {
         this.serviceInterface = serviceInterface;
     }
 
-    public ServiceConfiguration getServiceConfiguration() {
+    public HttpServiceConfiguration getServiceConfiguration() {
         return serviceConfiguration;
     }
 
-    public void setServiceConfiguration(ServiceConfiguration serviceConfiguration) {
+    public void setServiceConfiguration(HttpServiceConfiguration serviceConfiguration) {
         this.serviceConfiguration = serviceConfiguration;
     }
 }

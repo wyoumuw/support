@@ -1,19 +1,22 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.core;
 
 import java.lang.reflect.Proxy;
 
+import com.youmu.support.spring.serviceinvoker.core.HttpServiceConfiguration;
+import com.youmu.support.spring.serviceinvoker.core.ServiceInvokerFactory;
+import com.youmu.support.spring.serviceinvoker.core.ServiceProxy;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.Assert;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description:
  * @Date: 2018/08/17
  */
 public class WebServiceFactoryBean<T> implements FactoryBean<T> {
     private Class<T> webServiceInterface;
 
-    private ServiceConfiguration serviceConfiguration;
+    private HttpServiceConfiguration serviceConfiguration;
 
     private T webService;
 
@@ -50,11 +53,11 @@ public class WebServiceFactoryBean<T> implements FactoryBean<T> {
         this.webServiceInterface = webServiceInterface;
     }
 
-    public ServiceConfiguration getServiceConfiguration() {
+    public HttpServiceConfiguration getServiceConfiguration() {
         return serviceConfiguration;
     }
 
-    public void setServiceConfiguration(ServiceConfiguration serviceConfiguration) {
+    public void setServiceConfiguration(HttpServiceConfiguration serviceConfiguration) {
         // check it
         Assert.notNull(serviceConfiguration, "serviceConfiguration cannot be null");
         serviceConfiguration.checkServiceConfiguration();

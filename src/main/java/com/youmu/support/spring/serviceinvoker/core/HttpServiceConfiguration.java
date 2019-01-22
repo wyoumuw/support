@@ -1,4 +1,4 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.core;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.xml.transform.Source;
 
+import com.youmu.support.spring.serviceinvoker.protocol.ServiceDateConverter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -31,7 +32,7 @@ import com.google.common.collect.Lists;
 /**
  * Created by wyoumuw on 2018/8/17.
  */
-public class ServiceConfiguration {
+public class HttpServiceConfiguration {
 
     private static boolean romePresent = ClassUtils.isPresent("com.rometools.rome.feed.WireFeed",
             RestTemplate.class.getClassLoader());

@@ -1,7 +1,7 @@
 package com.youmu.exception;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description: 针对HTTP的返回码出现的错误
  * @Date: 2018/09/17
  */

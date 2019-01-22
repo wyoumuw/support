@@ -1,4 +1,4 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.httpclient.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,6 +15,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.youmu.common.Loggable;
+import com.youmu.support.spring.serviceinvoker.httpclient.HttpClientServiceConfiguration;
+import com.youmu.support.spring.serviceinvoker.core.HttpServiceConfiguration;
+import com.youmu.support.spring.serviceinvoker.core.ServiceInvoker;
+import com.youmu.support.spring.serviceinvoker.httpclient.HttpClientFactory;
+import com.youmu.support.spring.serviceinvoker.request.RequestInfoHolder;
+import com.youmu.support.spring.serviceinvoker.request.SpringParamInfoHolder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -48,11 +55,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+
 /**
  * Created by wyoumuw on 2018/8/17.
  */
 // @DependenceOn("jackson")
-public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
+public class DefaultServiceInvoker<T> implements ServiceInvoker<T>, Loggable {
 
     private final static MediaType DEFAULT_MEDIATYPE = MediaType.APPLICATION_JSON;
     private final static Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
@@ -62,7 +70,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     private RequestInfoHolder requestInfoHolder;
     private static Pattern PATTERN_CHARSET = Pattern.compile(";\\s*charset\\s*=\\s*(\\S+)");
 
-    public DefaultServiceInvoker(Method method, ServiceConfiguration serviceConfiguration) {
+    public DefaultServiceInvoker(Method method, HttpServiceConfiguration serviceConfiguration) {
         if (!(serviceConfiguration instanceof HttpClientServiceConfiguration)) {
             throw new IllegalArgumentException(
                     "serviceConfiguration must be instance from HttpClientServiceConfiguration");
@@ -79,7 +87,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
      * @return
      */
     protected RequestInfoHolder createRequestInfoHolder(Method method,
-            ServiceConfiguration serviceConfiguration) {
+            HttpServiceConfiguration serviceConfiguration) {
         RequestInfoHolder requestInfoHolder = new RequestInfoHolder();
         Class controllerClass = method.getDeclaringClass();
         RequestMapping contextRequestMapping = AnnotatedElementUtils
@@ -159,11 +167,27 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         CloseableHttpClient closeableHttpClient = httpClientFactory.get();
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder
                 .fromUriString(requestInfoHolder.getUri());
-        HttpUriRequest httpUriRequest = createHttpUriRequest(requestInfoHolder,
+        HttpRequestBase httpUriRequest = createHttpUriRequest(requestInfoHolder,
                 uriComponentsBuilder, args);
-        CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpUriRequest);
-        return httpClientServiceConfiguration.getHttpClientResponseHandler()
+        getLog().info("request service :" + httpUriRequest);
+        CloseableHttpResponse closeableHttpResponse = doRequest(closeableHttpClient,
+                httpUriRequest);
+        Object rtn = httpClientServiceConfiguration.getHttpClientResponseHandler()
                 .handleResponse(closeableHttpResponse, method.getGenericReturnType());
+        doClean(closeableHttpClient, httpUriRequest, closeableHttpResponse);
+        return rtn;
+    }
+
+    private void doClean(CloseableHttpClient closeableHttpClient, HttpRequestBase httpUriRequest,
+            CloseableHttpResponse closeableHttpResponse) throws IOException {
+        // httpUriRequest.releaseConnection();
+        closeableHttpResponse.close();
+        closeableHttpClient.close();
+    }
+
+    protected CloseableHttpResponse doRequest(CloseableHttpClient httpClient,
+            HttpUriRequest request) throws IOException {
+        return httpClient.execute(request);
     }
 
     /**
@@ -173,8 +197,8 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
      * @param args 调用服务的时候的入参
      * @return
      */
-    protected HttpUriRequest createHttpUriRequest(RequestInfoHolder requestInfoHolder,
-            UriComponentsBuilder uriComponentsBuilder, Object[] args) {
+    protected HttpRequestBase createHttpUriRequest(RequestInfoHolder requestInfoHolder,
+												   UriComponentsBuilder uriComponentsBuilder, Object[] args) {
         switch (requestInfoHolder.getRequestMethod()) {
         case GET:
             return createNoBodyRequest(requestInfoHolder, uriComponentsBuilder, args);
@@ -199,7 +223,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     }
 
     protected HttpRequestBase createNoBodyRequest(RequestInfoHolder requestInfoHolder,
-            UriComponentsBuilder uriComponentsBuilder, Object[] args) {
+												  UriComponentsBuilder uriComponentsBuilder, Object[] args) {
         HttpRequestBase httpRequest;
         if (requestInfoHolder.getRequestMethod() == RequestMethod.DELETE) {
             httpRequest = new HttpDelete();
@@ -249,7 +273,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     }
 
     protected HttpEntityEnclosingRequestBase createBodyRequest(RequestInfoHolder requestInfoHolder,
-            UriComponentsBuilder uriComponentsBuilder, Object[] args) {
+															   UriComponentsBuilder uriComponentsBuilder, Object[] args) {
         HttpEntityEnclosingRequestBase httpRequest;
         if (requestInfoHolder.getRequestMethod() == RequestMethod.PUT) {
             httpRequest = new HttpPut();
@@ -300,6 +324,11 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
         UriComponents uriComponents = uriComponentsBuilder.buildAndExpand(pathVariables);
         httpRequest.setURI(uriComponents.toUri());
         httpRequest.setEntity(httpEntity);
+        // 如果接口指定了content type那么这边也要带上
+        MediaType contentType = requestInfoHolder.getMergedContentType();
+        if (null != contentType) {
+            httpRequest.setHeader(org.apache.http.HttpHeaders.CONTENT_TYPE, contentType.toString());
+        }
         return httpRequest;
     }
 
@@ -316,7 +345,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
     }
 
     private void setQueryParam(UriComponentsBuilder uriComponentsBuilder, String name,
-            String value) {
+							   String value) {
         if (null != value) {
             uriComponentsBuilder.queryParam(name, value);
         }
@@ -347,7 +376,7 @@ public class DefaultServiceInvoker<T> implements ServiceInvoker<T> {
      * "relations[0].name":"xxx"
      * }
      * </code> all value will transform to String by
-     * ServiceConfiguration.ConversionService
+     * HttpServiceConfiguration.ConversionService
      * @param param
      * @param path
      * @param queryParam

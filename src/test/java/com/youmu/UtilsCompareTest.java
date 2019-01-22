@@ -6,7 +6,7 @@ import org.dozer.Mapper;
 import org.junit.Test;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description:
  * @Date: 2018/09/13
  */

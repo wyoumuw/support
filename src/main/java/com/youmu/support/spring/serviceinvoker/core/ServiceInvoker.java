@@ -1,7 +1,7 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.core;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description: 服务调用器接口
  * @Date: 2018/08/21
  */

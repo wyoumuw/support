@@ -3,8 +3,10 @@ package com.youmu.support.spring.web;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.youmu.support.spring.serviceinvoker.FilterFeignClientRequestMappingHandlerMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.SynthesizingMethodParameter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -20,6 +22,7 @@ import org.springframework.web.method.annotation.RequestParamMethodArgumentResol
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.PathVariableMethodArgumentResolver;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 import org.springframework.web.servlet.mvc.method.annotation.ServletCookieValueMethodArgumentResolver;
 
@@ -36,8 +39,13 @@ public class MvcSupportConfig extends WebMvcConfigurerAdapter {
     @Autowired
     private List<HttpMessageConverter<?>> httpMessageConverters;
 
+    @Bean
+    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+        return new FilterFeignClientRequestMappingHandlerMapping();
+    }
+
     /**
-     * more support
+     * 让spring mvc支持接口上的注解
      * {@link org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter#getDefaultArgumentResolvers()}
      * @param resolvers
      */
@@ -127,7 +135,7 @@ public class MvcSupportConfig extends WebMvcConfigurerAdapter {
     }
 
     public static MethodParameter interfaceMethodParameter(MethodParameter parameter,
-														   Class annotationType) {
+            Class annotationType) {
         if (!parameter.hasParameterAnnotation(annotationType)) {
             for (Class<?> itfc : parameter.getDeclaringClass().getInterfaces()) {
                 try {

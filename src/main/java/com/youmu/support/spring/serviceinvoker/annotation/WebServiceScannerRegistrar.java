@@ -1,6 +1,7 @@
 package com.youmu.support.spring.serviceinvoker.annotation;
 
-import com.youmu.support.spring.serviceinvoker.HttpServiceScanner;
+import com.youmu.support.spring.serviceinvoker.annotation.WebServiceScan;
+import com.youmu.support.spring.serviceinvoker.core.ServiceScanner;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
@@ -15,7 +16,7 @@ import org.springframework.util.StringUtils;
 
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description:
  * @Date: 2018/09/14
  */
@@ -35,7 +36,7 @@ public class WebServiceScannerRegistrar
             BeanDefinitionRegistry registry) {
         AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(
                 importingClassMetadata.getAnnotationAttributes(WebServiceScan.class.getName()));
-        HttpServiceScanner scanner = new HttpServiceScanner(registry);
+        ServiceScanner scanner = new ServiceScanner(registry);
         for (Class webServiceAnnotation : annoAttrs.getClassArray("webServiceAnnotations")) {
             scanner.addIncludeFilter(new AnnotationTypeFilter(webServiceAnnotation));
         }

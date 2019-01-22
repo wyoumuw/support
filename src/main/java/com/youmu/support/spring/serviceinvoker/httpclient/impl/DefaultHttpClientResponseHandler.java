@@ -1,4 +1,4 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.httpclient.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -7,9 +7,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.youmu.common.Loggable;
 import com.youmu.exception.HttpErrorException;
 import com.youmu.exception.WrappedThrowable;
+import com.youmu.support.spring.serviceinvoker.httpclient.HttpClientResponseHandler;
+import com.youmu.support.spring.serviceinvoker.httpclient.HttpClientServiceConfiguration;
+import com.youmu.utils.JSONUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -22,11 +25,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description:
  * @Date: 2018/08/23
  */
-public class DefaultHttpClientResponseHandler implements HttpClientResponseHandler {
+public class DefaultHttpClientResponseHandler implements HttpClientResponseHandler, Loggable {
 
     private HttpClientServiceConfiguration httpClientServiceConfiguration;
 
@@ -99,12 +102,15 @@ public class DefaultHttpClientResponseHandler implements HttpClientResponseHandl
      */
     protected void checkResponseStatus(CloseableHttpResponse httpResponse)
             throws HttpErrorException {
-        if (200 < httpResponse.getStatusLine().getStatusCode()
+        if (200 > httpResponse.getStatusLine().getStatusCode()
                 || 300 <= httpResponse.getStatusLine().getStatusCode()) {
+            getLog().info("request error code :{}", httpResponse.getStatusLine().getStatusCode());
             // 出错了尝试解析body
             try {
                 String entity = EntityUtils.toString(httpResponse.getEntity());
-                Map map = new ObjectMapper().readValue(entity, Map.class);
+                Map map = JSONUtils.deserialize(entity, Map.class);
+                // 可以序列化了则输出一下
+                getLog().info("response : {}", entity);
                 // 尝试获取message字段
                 throw new HttpErrorException(httpResponse.getStatusLine().getStatusCode(),
                         (String) map.get("message"));

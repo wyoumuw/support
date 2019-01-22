@@ -1,11 +1,16 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.httpclient;
+
+import com.youmu.support.spring.serviceinvoker.core.HttpServiceConfiguration;
+import com.youmu.support.spring.serviceinvoker.httpclient.HttpClientResponseHandler;
+import com.youmu.support.spring.serviceinvoker.httpclient.impl.DefaultHttpClientResponseHandler;
+import com.youmu.support.spring.serviceinvoker.httpclient.HttpClientFactory;
 
 import java.util.Map;
 
 /**
  * Created by wyoumuw on 2018/8/17.
  */
-public class HttpClientServiceConfiguration extends ServiceConfiguration {
+public class HttpClientServiceConfiguration extends HttpServiceConfiguration {
 
     /**
      * httpclient的工厂通过自定义来实现服务调用时使用的httpclient

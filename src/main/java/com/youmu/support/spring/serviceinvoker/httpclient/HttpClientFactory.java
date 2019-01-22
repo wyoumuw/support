@@ -1,4 +1,4 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.httpclient;
 
 import com.youmu.common.Factory;
 import org.apache.http.impl.client.CloseableHttpClient;

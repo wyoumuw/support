@@ -1,8 +1,9 @@
-package com.youmu.support.spring.serviceinvoker;
+package com.youmu.support.spring.serviceinvoker.core;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.youmu.support.spring.serviceinvoker.httpclient.impl.DefaultServiceInvokerFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -14,15 +15,15 @@ import org.springframework.util.StringUtils;
 import com.google.common.collect.Sets;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description: service扫描器
  * @Date: 2018/08/15
  */
-public class HttpServiceScanner extends ClassPathBeanDefinitionScanner {
+public class ServiceScanner extends ClassPathBeanDefinitionScanner {
 
     private static final String DEFAULT_SERVICE_INVOKER_FACTORY_NAME = DefaultServiceInvokerFactory.class
             .getCanonicalName();
-    // fix more than one HttpServiceScanner to instance that using one
+    // fix more than one ServiceScanner to instance that using one
     // serviceInvokerFactory issue
     private static AtomicInteger instanceNum = new AtomicInteger(0);
 
@@ -30,7 +31,7 @@ public class HttpServiceScanner extends ClassPathBeanDefinitionScanner {
 
     private String serviceInvokerFactoryName;
 
-    public HttpServiceScanner(BeanDefinitionRegistry registry) {
+    public ServiceScanner(BeanDefinitionRegistry registry) {
         super(registry, false);
         instanceNum.incrementAndGet();
     }
