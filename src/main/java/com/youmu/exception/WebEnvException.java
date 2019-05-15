@@ -1,7 +1,7 @@
 package com.youmu.exception;
 
 /**
- * @Author: YLBG-LDH-1506
+ * @Author: YOUMU
  * @Description: Web环境的exception
  * @Date: 2018/09/13
  */

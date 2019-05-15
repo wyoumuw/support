@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * @Author: youmu
- * @Description:
+ * @Description: The class depends on value() modules
  * @Date: 2018/08/17
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
