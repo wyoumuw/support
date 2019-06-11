@@ -1,44 +1,66 @@
-package com.youmu.cache;
+package com.youmu.cache.redis;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ReflectionUtils;
 
 import com.google.common.collect.Sets;
+import com.youmu.cache.CacheAnnotationHandler;
 import com.youmu.cache.annotation.Expireable;
+
 /**
  * @Author: YOUMU
- * @Description: 默认对redisManager的实现,未完成类注解缓存
- * @Date: 2017/11/08
+ * @Description:
+ * @Date: 2018/05/08
  */
-public class DefaultRedisCacheAnnotationHandler
-        implements CacheAnnotationHandler, InitializingBean {
+public class DefaultRedisCacheAnnotationHandler implements CacheAnnotationHandler, InitializingBean,
+        ApplicationListener<ContextRefreshedEvent> {
 
-    private Map<String, Long> expires = new ConcurrentHashMap<>();
+    private static final Field redisCacheManagerConfigsField;
+    private static final Field defaultConfigField;
 
-    private Set<Method> cachedMethods = ConcurrentHashMap.newKeySet();
-
+    static {
+        redisCacheManagerConfigsField = ReflectionUtils.findField(RedisCacheManager.class,
+                "initialCacheConfiguration");
+        defaultConfigField = ReflectionUtils.findField(RedisCacheManager.class,
+                "defaultCacheConfig");
+        if (null == redisCacheManagerConfigsField || null == defaultConfigField) {
+            throw new RuntimeException(
+                    "can not found initialCacheConfiguration in class 'RedisCacheManager' please check spring-data-redis version!");
+        }
+        ReflectionUtils.makeAccessible(redisCacheManagerConfigsField);
+        ReflectionUtils.makeAccessible(defaultConfigField);
+    }
     private RedisCacheManager redisCacheManager;
 
+    private RedisCacheConfiguration defaultConfig;
+
+    private Map<String, RedisCacheConfiguration> initialCacheConfiguration;
+
+    public DefaultRedisCacheAnnotationHandler(RedisCacheManager redisCacheManager) {
+        setRedisCacheManager(redisCacheManager);
+    }
+
+    public DefaultRedisCacheAnnotationHandler() {
+    }
+
     @Override
-    public HandleResult handle(Expireable expireable, MethodInvocation invocation) {
-        Method method;
-        // 做过处理的方法不再处理
-        if (null == invocation || cachedMethods.contains(method = invocation.getMethod())) {
-            return HandleResult.CONTINUE;
-        }
+    public void handle(Expireable expireable, Method method) {
         Long expire = (0 == expireable.expire() || TimeUnit.SECONDS.equals(expireable.timeUnit()))
                 ? expireable.expire()
                 : TimeUnit.SECONDS.convert(expireable.expire(), expireable.timeUnit());
@@ -60,10 +82,6 @@ public class DefaultRedisCacheAnnotationHandler
             // TODO extensible
             putExpireCaching(cachings, expire);
         }
-        redisCacheManager.setExpires(expires);
-        // last put method in cache for next check
-        cachedMethods.add(method);
-        return HandleResult.CONTINUE;
     }
 
     private void putExpireCaching(Collection<Caching> cachings, Long expire) {
@@ -77,7 +95,7 @@ public class DefaultRedisCacheAnnotationHandler
         for (CachePut cachePut : cachePuts) {
             for (int i = 0; i < cachePut.cacheNames().length; i++) {
                 String cacheName = cachePut.cacheNames()[i];
-                expires.put(cacheName, expire);
+                putExpire(cacheName, defaultConfig.entryTtl(Duration.ofSeconds(expire)));
             }
         }
     }
@@ -86,16 +104,15 @@ public class DefaultRedisCacheAnnotationHandler
         for (Cacheable cacheable : cacheables) {
             for (int i = 0; i < cacheable.cacheNames().length; i++) {
                 String cacheName = cacheable.cacheNames()[i];
-                expires.put(cacheName, expire);
+                putExpire(cacheName, defaultConfig.entryTtl(Duration.ofSeconds(expire)));
             }
         }
     }
 
-    public DefaultRedisCacheAnnotationHandler(RedisCacheManager redisCacheManager) {
-        this.redisCacheManager = redisCacheManager;
-    }
-
-    public DefaultRedisCacheAnnotationHandler() {
+    private void putExpire(String cacheName, RedisCacheConfiguration configuration) {
+        synchronized (redisCacheManager) {
+            initialCacheConfiguration.put(cacheName, configuration);
+        }
     }
 
     public void setRedisCacheManager(RedisCacheManager redisCacheManager) {
@@ -107,5 +124,14 @@ public class DefaultRedisCacheAnnotationHandler
         if (null == redisCacheManager) {
             throw new NullPointerException("redisCacheManager can not be null");
         }
+        initialCacheConfiguration = (Map<String, RedisCacheConfiguration>) redisCacheManagerConfigsField
+                .get(redisCacheManager);
+        defaultConfig = (RedisCacheConfiguration) defaultConfigField.get(redisCacheManager);
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        redisCacheManager.initializeCaches();
     }
 }

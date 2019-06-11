@@ -1,9 +1,10 @@
 package com.youmu;
 
-import com.youmu.cache.CacheAnnotationHandler;
-import com.youmu.cache.ExpireableConfig;
-import com.youmu.cache.RedisConfig;
-import com.youmu.cache.annotation.Expireable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import com.youmu.cache.redis.RedisConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -12,12 +13,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.youmu.cache.ExpireableConfig;
 
 /**
  * @Author: YOUMU
@@ -29,11 +25,6 @@ import java.util.Set;
 public class AppTest implements BeanFactoryAware {
 
     BeanFactory beanFactory;
-
-    @Test
-    public void t1() {
-        System.out.println(beanFactory.getBean(CacheAnnotationHandler.class));
-    }
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
