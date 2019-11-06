@@ -68,9 +68,8 @@ public final class NetUtils {
      * @throws WebEnvException
      */
     public static HttpServletRequest getRequest() throws WebEnvException {
-        return (HttpServletRequest) Optional
-                .ofNullable(RequestContextHolder.getRequestAttributes()
-                        .resolveReference(RequestAttributes.REFERENCE_REQUEST))
-                .orElseThrow(() -> new WebEnvException("not found web environment"));
+        return (HttpServletRequest) Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+            .map(ra -> ra.resolveReference(RequestAttributes.REFERENCE_REQUEST))
+            .orElseThrow(() -> new WebEnvException("not found web environment"));
     }
 }
