@@ -62,7 +62,9 @@ public class CustomableCacheAnnotationParser extends SpringCacheAnnotationParser
         if (!CollectionUtils.isEmpty(cacheOperations)) {
             Expireable expireable = AnnotatedElementUtils.findMergedAnnotation(method,
                     Expireable.class);
-            cacheAnnotationHandler.handle(expireable, method);
+            if (null != expireable) {
+                cacheAnnotationHandler.handle(expireable, method);
+            }
         }
         return cacheOperations;
     }

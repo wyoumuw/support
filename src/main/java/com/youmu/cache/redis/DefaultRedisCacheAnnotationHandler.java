@@ -41,7 +41,7 @@ public class DefaultRedisCacheAnnotationHandler implements CacheAnnotationHandle
                 "defaultCacheConfig");
         if (null == redisCacheManagerConfigsField || null == defaultConfigField) {
             throw new RuntimeException(
-                    "can not found initialCacheConfiguration in class 'RedisCacheManager' please check spring-data-redis version!");
+                    "can not found initialCacheConfiguration in class 'RedisCacheManager' please check spring-data-redis version! 2.0.0up ");
         }
         ReflectionUtils.makeAccessible(redisCacheManagerConfigsField);
         ReflectionUtils.makeAccessible(defaultConfigField);
