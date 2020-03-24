@@ -221,7 +221,7 @@ public abstract class ReflectUtils {
 
     /**
      * 属性拷贝source->target look
-     * {@link ReflectUtils#copyProperties(java.lang.Object, java.lang.Object, cn.ucmed.yilian.common.utils.ReflectUtils.TriFunction)}
+     * {@link ReflectUtils#copyProperties(java.lang.Object, java.lang.Object, TriFunction)}
      * @param source
      * @param target
      * @param <S>

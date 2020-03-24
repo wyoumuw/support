@@ -1,5 +1,8 @@
 package com.youmu.utils;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -18,6 +21,27 @@ public final class EnumUtils {
     private static final Logger LOG = LoggerFactory.getLogger(EnumUtils.class);
 
     private EnumUtils() {
+    }
+
+    /**
+     * 使用枚举生成对应的map,重名后面的会覆盖掉前面的
+     * @param enumClass 枚举类型
+     * @param keyGetFunc 用枚举生成枚举key的方法
+     * @param <E> 枚举类型
+     * @param <K> key的类型
+     * @return key->枚举的map
+     */
+    public static <E extends Enum<E>, K> Map<K, E> toMap(Class<E> enumClass, Function<E, K> keyGetFunc) {
+        if (null == enumClass || null == keyGetFunc) {
+            throw new IllegalArgumentException("缺少参数，enumClass或keyGetFunc");
+        }
+        E[] enumConstants = enumClass.getEnumConstants();
+        Map<K, E> map = new HashMap<>(enumConstants.length);
+        for (E enumConstant : enumConstants) {
+            K key = keyGetFunc.apply(enumConstant);
+            map.put(key, enumConstant);
+        }
+        return Collections.unmodifiableMap(map);
     }
 
     /**
