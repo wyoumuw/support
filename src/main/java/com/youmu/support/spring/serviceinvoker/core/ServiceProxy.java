@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
  */
 public class ServiceProxy<T> implements InvocationHandler {
 
-    private Map<Method, DefaultServiceInvoker> cachedInvokers = new ConcurrentHashMap<>();
+    private Map<Method, ServiceInvoker> cachedInvokers = new ConcurrentHashMap<>();
 
     private Class<T> serviceInterface;
 
@@ -47,6 +47,7 @@ public class ServiceProxy<T> implements InvocationHandler {
         ServiceInvoker serviceInvoker = cachedInvokers.get(method);
         if (null == serviceInvoker) {
             serviceInvoker = serviceInvokerFactory.create(method);
+            cachedInvokers.put(method,serviceInvoker);
         }
         return serviceInvoker;
     }
