@@ -1,6 +1,6 @@
-package com.youmu.cache;
+package com.youmu.support.spring.cache;
 
-import com.youmu.cache.annotation.EnableExpireableCache;
+import com.youmu.support.spring.cache.annotation.EnableExpireableCache;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.AdviceModeImportSelector;
 

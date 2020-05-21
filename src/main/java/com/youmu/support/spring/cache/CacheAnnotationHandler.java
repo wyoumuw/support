@@ -1,8 +1,6 @@
-package com.youmu.cache;
+package com.youmu.support.spring.cache;
 
-import org.aopalliance.intercept.MethodInvocation;
-
-import com.youmu.cache.annotation.Expireable;
+import com.youmu.support.spring.cache.annotation.Expireable;
 
 import java.lang.reflect.Method;
 

@@ -1,11 +1,11 @@
-package com.youmu.cache.redis;
+package com.youmu.support.spring.cache.redis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 
-import com.youmu.cache.CacheAnnotationHandler;
-import com.youmu.cache.CustomableCacheAnnotationParser;
+import com.youmu.support.spring.cache.CacheAnnotationHandler;
+import com.youmu.support.spring.cache.CustomableCacheAnnotationParser;
 
 /**
  * @Author: YOUMU

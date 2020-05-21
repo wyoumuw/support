@@ -1,9 +1,8 @@
-package com.youmu.cache;
+package com.youmu.support.spring.cache;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cache.annotation.AnnotationCacheOperationSource;
-import org.springframework.cache.annotation.ProxyCachingConfiguration;
 import org.springframework.cache.interceptor.CacheOperationSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

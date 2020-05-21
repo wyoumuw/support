@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.youmu.cache.redis.RedisConfig;
+import com.youmu.support.spring.cache.redis.RedisConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.youmu.cache.ExpireableConfig;
+import com.youmu.support.spring.cache.ExpireableConfig;
 
 /**
  * @Author: YOUMU

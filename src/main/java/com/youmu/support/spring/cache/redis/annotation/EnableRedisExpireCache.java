@@ -1,4 +1,4 @@
-package com.youmu.cache.redis.annotation;
+package com.youmu.support.spring.cache.redis.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.youmu.cache.redis.RedisConfig;
+import com.youmu.support.spring.cache.redis.RedisConfig;
 import org.springframework.context.annotation.Import;
 
 
