@@ -20,10 +20,8 @@ code
     @Configuration
     //这个是开启默认对RedisCacheManager的配置,不启用则自行配置CacheAnnotationHandler
     @EnableRedisExpireCache
-    //开启过期配置,就算被删除了也不会对原有的springcache有影响，只是配置了的过期不生效
+    //开启过期配置,如果是不想用了可以直接使用@EnableCaching就可以
     @EnableExpireableCache
-    //开启spring的cache
-    @EnableCaching
     public class CacheConfig implements CachingConfigurer, Loggable {
     
         @Value("${redis.hostName}")
