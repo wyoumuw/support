@@ -1,18 +1,20 @@
 package com.youmu;
 
 import com.google.common.collect.Lists;
-
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.parsing.XPathParser;
+import org.apache.ibatis.scripting.xmltags.XMLScriptBuilder;
+import org.apache.ibatis.session.Configuration;
 import org.junit.Test;
 import org.springframework.util.ReflectionUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO
@@ -225,5 +227,26 @@ public class MybatisUtilsTest {
     public static void generateTest() {
         //        Class
 
+    }
+
+    @Test
+    public void dynamicSqlTest() throws  Exception{
+        Configuration configuration =new Configuration();
+        //<script>里的东西替换成具体sql
+        String script = "<script>select id from user where <if test='filter'>id=#{id}</if></script>";
+        XPathParser parser = new XPathParser(script, false, configuration.getVariables(), new XMLMapperEntityResolver());
+        XMLScriptBuilder builder = new XMLScriptBuilder(configuration, parser.evalNode("/script"), org.apache.ibatis.binding.MapperMethod.ParamMap.class);
+        //构造参数，如果是对象那么param也换成对象
+        Map<String,Object> param = new HashMap<>();
+        param.put("id", 1L);
+        param.put("filter", true);
+        BoundSql boundSql = builder.parseScriptNode().getBoundSql(param);
+        String sql = boundSql.getSql();
+        System.out.println(sql);
+        System.out.println("参数为");
+        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+        for (ParameterMapping parameterMapping : parameterMappings) {
+            System.out.println(parameterMapping.toString());
+        }
     }
 }
