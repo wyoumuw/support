@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="test" targetRuntime="MyBatis3">
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
+        <plugin type="com.youmu.support.mybatis.generator.MapperTestGeneratorPlugin"/>
+        <plugin type="com.youmu.support.mybatis.generator.RenameRecordParamPlugin"/>
+        <commentGenerator type="org.mybatis.generator.internal.DefaultCommentGenerator">
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/bookmart?serverTimezone=GMT%2B8&amp;useSSL=true"
+                        userId="x"
+                        password="x">
+        </jdbcConnection>
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+        <javaModelGenerator targetPackage="com.youmu.maven.model" targetProject="src/main/java"/>
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.youmu.maven.mapper" targetProject="src/main/java"/>
+        <table tableName="book" enableCountByExample="false" enableSelectByExample="false" enableDeleteByExample="false" enableUpdateByExample="false" enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="true"/>
+    </context>
+</generatorConfiguration>
