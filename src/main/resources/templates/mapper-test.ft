@@ -1,0 +1,174 @@
+package ${mapperType.packageName};
+
+import ${mapperType.fullyQualifiedName};
+import ${baseType.fullyQualifiedName};
+#if($superType)import ${superType.fullyQualifiedName};#end
+import org.junit.Assert;
+import org.junit.Test;
+import java.util.Date;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+#set($pkColums=$table.primaryKeyColumns)
+#set($nonPkColums=$table.nonPrimaryKeyColumns)
+#set($nullableColums=$MybatisUtils.getNullableList($table))
+#set($notNullableColumns=$MybatisUtils.getNotNullableList($table))
+#set($allColumns=$table.allColumns)
+@Transactional
+public class ${mapperType.shortName}Test #if($superType)extends ${superType.shortName}#end {
+
+    @Autowired
+    private ${mapperType.shortName} mapper;
+
+    @Test
+    public void deleteByPrimaryKey() {
+    }
+
+    @Test
+    public void insert() {
+        ${baseType.shortName} entity = generateEntity();
+        mapper.insert(entity);
+        ${baseType.shortName} actual = getEntity(entity);
+        compare(entity, actual);
+    }
+
+    @Test
+    public void insertSelectiveCase1() {
+        ${baseType.shortName} entity = generateEntity();
+        mapper.insertSelective(entity);
+        ${baseType.shortName} actual = getEntity(entity);
+        compare(entity, actual);
+    }
+
+    @Test
+    public void insertSelectiveCase2() {
+        ${baseType.shortName} entity = generateAllNullEntity();
+        mapper.insertSelective(entity);
+        ${baseType.shortName} actual = getEntity(entity);
+        compare(entity, actual);
+    }
+
+    @Test
+    public void updateByPrimaryKeySelectiveCase1() {
+        ${baseType.shortName} entity = generateEntity();
+        mapper.insert(entity);
+        reset(entity);
+        mapper.updateByPrimaryKey(entity);
+        ${baseType.shortName} actual = getEntity(entity);
+        compare(entity, actual);
+    }
+
+    @Test
+    public void updateByPrimaryKeySelectiveCase2() {
+        ${baseType.shortName} entity = generateEntity();
+        mapper.insert(entity);
+        ${baseType.shortName}  forUpdate = new ${baseType.shortName} ();
+        //set primary
+        #foreach($pkColumn in $pkColums)
+        forUpdate.$MybatisUtils.setter($pkColumn.javaProperty)(entity.$MybatisUtils.getter($pkColumn.javaProperty)());
+        #end
+        //set one field and not null field
+        #foreach($notNullableColumn in $notNullableColumns)
+            $notNullableColumn.fullyQualifiedJavaType.shortName $notNullableColumn.javaProperty = $MybatisUtils.randomValue($notNullableColumn);
+        forUpdate.$MybatisUtils.setter($notNullableColumn.javaProperty)($notNullableColumn.javaProperty);
+        entity.$MybatisUtils.setter($notNullableColumn.javaProperty)($notNullableColumn.javaProperty);
+        #end
+        #if(!$notNullableColumns||$notNullableColumns.size()==0)
+            #if($nullableColums&&$nullableColums.size()>0)
+                $nullableColums[0].fullyQualifiedJavaType.shortName $nullableColums[0].javaProperty = $MybatisUtils.randomValue($nullableColums[0]);
+                forUpdate.$MybatisUtils.setter($nullableColums[0].javaProperty)($nullableColums[0].javaProperty);
+                entity.$MybatisUtils.setter($nullableColums[0].javaProperty)($nullableColums[0].javaProperty);
+            #else
+                //todo I don't known how to test it!
+            #end
+        #end
+        mapper.updateByPrimaryKeySelective(forUpdate);
+        ${baseType.shortName} actual = getEntity(entity);
+        compare(entity, actual);
+    }
+
+    @Test
+    public void updateByPrimaryKeySelectiveCase3() {
+    ${baseType.shortName} entity = generateEntity();
+    mapper.insert(entity);
+    ${baseType.shortName}  forUpdate = new ${baseType.shortName} ();
+    //set primary
+    #foreach($pkColumn in $pkColums)
+    forUpdate.$MybatisUtils.setter($pkColumn.javaProperty)(entity.$MybatisUtils.getter($pkColumn.javaProperty)());
+    #end
+    //set one field and not null field
+    #foreach($notNullableColumn in $notNullableColumns)
+        $notNullableColumn.fullyQualifiedJavaType.shortName $notNullableColumn.javaProperty = $MybatisUtils.randomValue($notNullableColumn);
+    forUpdate.$MybatisUtils.setter($notNullableColumn.javaProperty)($notNullableColumn.javaProperty);
+    entity.$MybatisUtils.setter($notNullableColumn.javaProperty)($notNullableColumn.javaProperty);
+    #end
+    ##case3 will set one field that different with case2
+    #set($case3Index=0)
+    #if(!$notNullableColumns||$notNullableColumns.size()==0)
+        ##have to use next not nullable property [1] for check, because case2 has used not nullable property [0]
+        #set($case3Index=1)
+    #end
+    #if($nullableColums&&$nullableColums.size()>$case3Index)
+        $nullableColums[$case3Index].fullyQualifiedJavaType.shortName $nullableColums[$case3Index].javaProperty = $MybatisUtils.randomValue($nullableColums[$case3Index]);
+    forUpdate.$MybatisUtils.setter($nullableColums[$case3Index].javaProperty)($nullableColums[$case3Index].javaProperty);
+    entity.$MybatisUtils.setter($nullableColums[$case3Index].javaProperty)($nullableColums[$case3Index].javaProperty);
+    #else
+    //todo I don't known how to test it!
+    #end
+    mapper.updateByPrimaryKeySelective(forUpdate);
+    ${baseType.shortName} actual = getEntity(entity);
+    compare(entity, actual);
+    }
+
+    @Test
+    public void updateByPrimaryKey() {
+        ${baseType.shortName} entity = generateEntity();
+        mapper.insert(entity);
+        reset(entity);
+        mapper.updateByPrimaryKey(entity);
+        ${baseType.shortName} actual = getEntity(entity);
+        compare(entity, actual);
+    }
+
+    private void reset(${baseType.shortName} entity) {
+        #if(!$nonPkColums||$nonPkColums.size()==0)
+            //todo nothing to set please check unit test is usable
+        #end
+        #foreach($nonPkColum in $nonPkColums)
+        entity.$MybatisUtils.setter($nonPkColum.javaProperty)($MybatisUtils.randomValue($nonPkColum));
+        #end
+    }
+
+    private ${baseType.shortName} getEntity(${baseType.shortName} entity) {
+        #if($pkColums&&$pkColums>1)
+        //todo please write down mapper.selectByPrimaryKey() here, will not generate this method when multiple primary key
+        #else
+        return mapper.selectByPrimaryKey(entity.$MybatisUtils.getter($pkColums[0].javaProperty)());
+        #end
+    }
+
+    private void compare(${baseType.shortName} expect, ${baseType.shortName} actual) {
+        #foreach($column in $allColumns)
+        Assert.assertEquals(expect.$MybatisUtils.getter($column.javaProperty)(), expect.$MybatisUtils.getter($column.javaProperty)());
+        #end
+    }
+
+    private ${baseType.shortName} generateEntity() {
+        ${baseType.shortName} entity = new ${baseType.shortName}();
+        #foreach($column in $allColumns)
+        entity.$MybatisUtils.setter($column.javaProperty)($MybatisUtils.randomValue($column));
+        #end
+        return entity;
+    }
+
+    private ${baseType.shortName} generateAllNullEntity() {
+        ${baseType.shortName} entity = new ${baseType.shortName}();
+        #foreach($pkColumn in $pkColums)
+        entity.$MybatisUtils.setter($pkColumn.javaProperty)($MybatisUtils.randomValue($pkColumn));
+        #end
+        #foreach($notNullableColumn in $notNullableColumns)
+        entity.$MybatisUtils.setter($notNullableColumn.javaProperty)($MybatisUtils.randomValue($notNullableColumn));
+        #end
+        return entity;
+    }
+}
